@@ -7,11 +7,11 @@ from snowman import snowman_goal_state
 
 #Select what to test
 test_time_astar = True
-test_time_gbfs = True
-test_manhattan = True
-test_fval_function = True
-test_anytime_gbfs = True
-test_alternate = True
+test_time_gbfs = False
+test_manhattan = False
+test_fval_function = False
+test_anytime_gbfs = False
+test_alternate = False
 test_anytime_weighted_astar = True
 
 TIMEOUT = 5 #timeout to impose
@@ -85,7 +85,8 @@ if __name__ == '__main__':
 
       print("*************************************")
       print("PROBLEM {}".format(i))
-
+      print(PROBLEMS[i].state_string())
+      
       s0 = PROBLEMS[i] #Final problems are hardest
       se = SearchEngine('best_first', 'full')
       se.init_search(s0, goal_fn=snowman_goal_state, heur_fn=heur_alternate)
@@ -179,7 +180,7 @@ if __name__ == '__main__':
       print("PROBLEM {}".format(i))
 
       s0 = PROBLEMS[i] #Final problems are hardest
-      weight = 100 #we will start with a large weight so you can experiment with rate at which it decrements
+      weight = 25 #we will start with a large weight so you can experiment with rate at which it decrements
       final = anytime_weighted_astar(s0, heur_fn=heur_alternate, weight=weight, timebound=timebound)
 
       if final:

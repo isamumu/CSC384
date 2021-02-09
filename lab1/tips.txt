@@ -1,0 +1,6 @@
+# ======= TIPS ======= # 
+1. In computing a heuristic, avoid having loops as much as possible because it will negatively affect the run time
+2. Due to tight time constraints, it is difficult to construct an elaborate heuristic; Look at the Sokoban space and consider simple positions which the robot should avoid in certain scenarios
+3. Heuristics can award a path to make it more desirable, but it is more efficient to come up with penalties for certain moves
+4. When brainstorming penalties, consider deadlocks that will stall the game; look into how corners and edges play a role in creating deadlocks
+5. To improve performance, sometimes it is necessary to combine hearistics; consider awarding a path if it has a snowball in line with the goal and combinging it with the penalty heuristics
