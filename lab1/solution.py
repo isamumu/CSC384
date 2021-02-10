@@ -53,7 +53,7 @@ def heur_alternate(state):
     #Write a heuristic function that improves upon heur_manhattan_distance to estimate distance between the current state and the goal.
     #Your function should return a numeric value for the estimate of the distance to the goal.
 
-    PENALTY = 1000000 # penalization weight
+    PENALTY = 1000 # penalization weight
     
     # IDEA: since creating a new heuristic based on rewarding the best past results in worse runtimes, the approach below will penalize bad moves instead
     # This includes: deadlocks on edges, corners, and times when the order of snowballs is disrupted on the goal 'b' -> 'm' -> 's'
@@ -73,12 +73,18 @@ def heur_alternate(state):
     obstacles = state.obstacles
 
     cost = [] # find the cost representing the closes snowball to the robot (no need to accumilate all costs)
-
+    # cost2 = [] 
     # loop through each existing snowball for the deadlock states
- 
+    
+    # The goal is to penalize deadlock states which can come in two forms:
+    # 1. Going to an edge of a wall or obstacle that has no goal
+    # 2. Going to a corner with no goal
+    # Additionally, we want to enforce shortest paths to the nearest snowball, so we calculate the manhattan
+    # distance between the robot to each snowball, take the minimum, and add it to the overall manhattan distance for cost
+    # It was found that adding total manhattan cost to the path cost to the nearest snowall solves the most problems
     for snowball in state.snowballs:
         cost.append(abs(robot[0] - snowball[0]) + abs(robot[1] - snowball[1]))
-
+        # cost2.append(abs(snowball[0] - goal[0]) + abs(snowball[1] - goal[1]))
         # snowball[0] == goal[0] somehow works! 
         if snowball[0] == goal[0]:
             continue
@@ -137,7 +143,8 @@ def heur_alternate(state):
             return PENALTY
     
     mini = min(cost)
-    return mini + heur_manhattan_distance(state)
+    # mini2 = min(cost2)
+    return mini + heur_manhattan_distance(state) # + mini2
 
 def heur_zero(state):
     '''Zero Heuristic can be used to make A* search perform uniform cost search'''
