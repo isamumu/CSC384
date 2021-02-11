@@ -43,6 +43,7 @@ def trivial_heuristic(state):
   '''OUTPUT: a numeric value that serves as an estimate of the distance of the state (# of moves required to get) to the goal.'''   
   return len(state.snowballs)
 
+
 # (approx... its up to me...)
 def heur_alternate(state):
 #IMPLEMENT
@@ -71,7 +72,7 @@ def heur_alternate(state):
     robot = state.robot
     goal = state.destination
     obstacles = state.obstacles
-
+    hash_obs = {}
     cost = [] # find the cost representing the closes snowball to the robot (no need to accumilate all costs)
     # cost2 = [] 
     # loop through each existing snowball for the deadlock states
@@ -82,8 +83,9 @@ def heur_alternate(state):
     # Additionally, we want to enforce shortest paths to the nearest snowball, so we calculate the manhattan
     # distance between the robot to each snowball, take the minimum, and add it to the overall manhattan distance for cost
     # It was found that adding total manhattan cost to the path cost to the nearest snowall solves the most problems
+
     for snowball in state.snowballs:
-        cost.append(abs(robot[0] - snowball[0]) + abs(robot[1] - snowball[1]))
+        # cost.append(abs(robot[0] - snowball[0]) + abs(robot[1] - snowball[1]))
         # cost2.append(abs(snowball[0] - goal[0]) + abs(snowball[1] - goal[1]))
         # snowball[0] == goal[0] somehow works! 
         if snowball[0] == goal[0]:
@@ -131,6 +133,21 @@ def heur_alternate(state):
         if ((snowball[0], snowball[1] + 1) or bottom_edge) in obstacles and ((snowball[0] - 1, snowball[1]) in obstacles or left_edge) and goal[1] != snowball[1]:
             return PENALTY
         '''
+
+        '''
+        if ((snowball[0] + 1, snowball[1]) in hash_obs or right_edge) and ((snowball[0], snowball[1] + 1) in hash_obs or top_edge) and goal[0] != snowball[0]:
+            return PENALTY
+        # top left
+        if ((snowball[0] - 1, snowball[1]) in hash_obs or left_edge) and ((snowball[0], snowball[1] + 1) in hash_obs or top_edge) and goal[0] != snowball[0]:
+            return PENALTY
+        # bottom right
+        if ((snowball[0], snowball[1] + 1) in hash_obs or bottom_edge) and ((snowball[0] + 1, snowball[1]) in hash_obs or right_edge) and goal[1] != snowball[1]:
+            return PENALTY
+        # bottom left
+        if ((snowball[0], snowball[1] + 1) in hash_obs or bottom_edge) and ((snowball[0] - 1, snowball[1]) in hash_obs or left_edge) and goal[1] != snowball[1]:
+            return PENALTY
+        '''
+        
         # edge checks
         if right_edge and goal[0] != snowball[0]:
             return PENALTY
@@ -144,7 +161,7 @@ def heur_alternate(state):
         elif top_edge and goal[1] != snowball[1]:
             return PENALTY
     
-    mini = min(cost)
+    # mini = min(cost)
     # mini2 = min(cost2)
     return heur_manhattan_distance(state) # + mini2
 
