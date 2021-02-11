@@ -163,7 +163,7 @@ def heur_alternate(state):
     
     # mini = min(cost)
     # mini2 = min(cost2)
-    return heur_manhattan_distance(state) # + mini2
+    return heur_manhattan_distance(state) + trivial_heuristic(state)# + mini2
 
 def heur_zero(state):
     '''Zero Heuristic can be used to make A* search perform uniform cost search'''
