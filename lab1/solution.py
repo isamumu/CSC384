@@ -85,7 +85,7 @@ def heur_alternate(state):
     # It was found that adding total manhattan cost to the path cost to the nearest snowall solves the most problems
 
     for snowball in state.snowballs:
-        # cost.append(abs(robot[0] - snowball[0]) + abs(robot[1] - snowball[1]))
+        cost.append(abs(robot[0] - snowball[0]) + abs(robot[1] - snowball[1]))
         # cost2.append(abs(snowball[0] - goal[0]) + abs(snowball[1] - goal[1]))
         # snowball[0] == goal[0] somehow works! 
         if snowball[0] == goal[0]:
@@ -101,7 +101,7 @@ def heur_alternate(state):
             bottom_edge = True
 
         # corner checks
-        
+        '''
         if not right_edge and not top_edge:
             if snowball[0] == boardX - 1 and snowball[1] == 0:
                 return PENALTY
@@ -117,10 +117,10 @@ def heur_alternate(state):
         elif not left_edge and not bottom_edge:
             if snowball[0] == 0 and snowball[1] == boardY - 1:
                 return PENALTY
-        
+        '''
         # check against obstacles
         # top right
-        if boardX < 10 and boardY < 9:
+        if boardX < 7 and boardY < 7:
             if ((snowball[0] + 1, snowball[1]) or right_edge) in obstacles and ((snowball[0], snowball[1] + 1) in obstacles or top_edge) and goal[0] != snowball[0]:
                 return PENALTY
             # top left
@@ -162,9 +162,9 @@ def heur_alternate(state):
         elif top_edge and goal[1] != snowball[1]:
             return PENALTY
     
-    # mini = min(cost)
+    mini = min(cost)
     # mini2 = min(cost2)
-    return heur_manhattan_distance(state) # + mini2
+    return heur_manhattan_distance(state) + mini # + mini2
 
 def heur_zero(state):
     '''Zero Heuristic can be used to make A* search perform uniform cost search'''
