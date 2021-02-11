@@ -173,9 +173,9 @@ def heur_alternate(state):
             return PENALTY
     
     
-    # mini = min(cost)
+    mini = min(cost)
     # mini2 = min(cost2)
-    return heur_manhattan_distance(state) # + mini # + mini2
+    return heur_manhattan_distance(state) + mini # + mini2
 
 def heur_zero(state):
     '''Zero Heuristic can be used to make A* search perform uniform cost search'''
