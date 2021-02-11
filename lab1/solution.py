@@ -148,7 +148,7 @@ def heur_alternate(state):
         elif top_edge and goal[1] != snowball[1]:
             return PENALTY
         
-        
+        '''
         if (robot[0] - 1, robot[1]) == snowball and (robot[0] - 2, robot[1]) in state.snowballs and ((robot[0] - 2, robot[1]) in obstacles or (robot[0] - 2) == -1):
             return PENALTY
         elif (robot[0] + 1, robot[1]) == snowball and (robot[0] + 2, robot[1]) in state.snowballs and ((robot[0] + 2, robot[1]) in obstacles or (robot[0] + 2) == boardX):
@@ -157,7 +157,7 @@ def heur_alternate(state):
             return PENALTY
         elif (robot[0], robot[1] + 1) == snowball and (robot[0], robot[1] + 2) in state.snowballs and ((robot[0], robot[1] + 2) in obstacles or (robot[1] + 2) == boardY):
             return PENALTY
-        
+        '''
     
     mini = min(cost)
     # mini2 = min(cost2)
