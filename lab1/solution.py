@@ -74,6 +74,7 @@ def heur_alternate(state):
     obstacles = state.obstacles
     hash_obs = {}
     cost = [] # find the cost representing the closes snowball to the robot (no need to accumilate all costs)
+
     # cost2 = [] 
     # loop through each existing snowball for the deadlock states
     
@@ -101,23 +102,23 @@ def heur_alternate(state):
             bottom_edge = True
 
         # corner checks
-        '''
-        if not right_edge and not top_edge:
-            if snowball[0] == boardX - 1 and snowball[1] == 0:
-                return PENALTY
+        if boardX >= 7 and boardY >= 7:
+            if not right_edge and not top_edge:
+                if snowball[0] == boardX - 1 and snowball[1] == 0:
+                    return PENALTY
 
-        elif not right_edge and not bottom_edge:
-            if snowball[0] == boardX - 1 and snowball[1] == boardY - 1:
-                return PENALTY
+            elif not right_edge and not bottom_edge:
+                if snowball[0] == boardX - 1 and snowball[1] == boardY - 1:
+                    return PENALTY
 
-        elif not left_edge and not top_edge:
-            if snowball[0] == 0 and snowball[1] == 0:
-                return PENALTY
+            elif not left_edge and not top_edge:
+                if snowball[0] == 0 and snowball[1] == 0:
+                    return PENALTY
 
-        elif not left_edge and not bottom_edge:
-            if snowball[0] == 0 and snowball[1] == boardY - 1:
-                return PENALTY
-        '''
+            elif not left_edge and not bottom_edge:
+                if snowball[0] == 0 and snowball[1] == boardY - 1:
+                    return PENALTY
+        
         # check against obstacles
         # top right
         if boardX < 7 and boardY < 7:
@@ -134,21 +135,6 @@ def heur_alternate(state):
                 return PENALTY
         
         
-
-        '''
-        if ((snowball[0] + 1, snowball[1]) in hash_obs or right_edge) and ((snowball[0], snowball[1] + 1) in hash_obs or top_edge) and goal[0] != snowball[0]:
-            return PENALTY
-        # top left
-        if ((snowball[0] - 1, snowball[1]) in hash_obs or left_edge) and ((snowball[0], snowball[1] + 1) in hash_obs or top_edge) and goal[0] != snowball[0]:
-            return PENALTY
-        # bottom right
-        if ((snowball[0], snowball[1] + 1) in hash_obs or bottom_edge) and ((snowball[0] + 1, snowball[1]) in hash_obs or right_edge) and goal[1] != snowball[1]:
-            return PENALTY
-        # bottom left
-        if ((snowball[0], snowball[1] + 1) in hash_obs or bottom_edge) and ((snowball[0] - 1, snowball[1]) in hash_obs or left_edge) and goal[1] != snowball[1]:
-            return PENALTY
-        '''
-        
         # edge checks
         if right_edge and goal[0] != snowball[0]:
             return PENALTY
@@ -162,7 +148,7 @@ def heur_alternate(state):
         elif top_edge and goal[1] != snowball[1]:
             return PENALTY
         
-
+        """
         if (robot[0] - 1, robot[1]) == snowball and (robot[0] - 2, robot[1]) in state.snowballs and ((robot[0] - 2, robot[1]) in obstacles or (robot[0] - 2) == -1):
             return PENALTY
         elif (robot[0] + 1, robot[1]) == snowball and (robot[0] + 2, robot[1]) in state.snowballs and ((robot[0] + 2, robot[1]) in obstacles or (robot[0] + 2) == boardX):
@@ -171,7 +157,7 @@ def heur_alternate(state):
             return PENALTY
         elif (robot[0], robot[1] + 1) == snowball and (robot[0], robot[1] + 2) in state.snowballs and ((robot[0], robot[1] + 2) in obstacles or (robot[1] + 2) == boardY):
             return PENALTY
-    
+        """
     
     mini = min(cost)
     # mini2 = min(cost2)
