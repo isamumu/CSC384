@@ -120,18 +120,18 @@ def heur_alternate(state):
         
         # check against obstacles
         # top right
-        if(len(obstacles) > 7)
-        if ((snowball[0] + 1, snowball[1]) or right_edge) in obstacles and ((snowball[0], snowball[1] + 1) in obstacles or top_edge) and goal[0] != snowball[0]:
-            return PENALTY
-        # top left
-        if ((snowball[0] - 1, snowball[1]) or left_edge) in obstacles and ((snowball[0], snowball[1] + 1) in obstacles or top_edge) and goal[0] != snowball[0]:
-            return PENALTY
-        # bottom right
-        if ((snowball[0], snowball[1] + 1) or bottom_edge) in obstacles and ((snowball[0] + 1, snowball[1]) in obstacles or right_edge) and goal[1] != snowball[1]:
-            return PENALTY
-        # bottom left
-        if ((snowball[0], snowball[1] + 1) or bottom_edge) in obstacles and ((snowball[0] - 1, snowball[1]) in obstacles or left_edge) and goal[1] != snowball[1]:
-            return PENALTY
+        if(len(obstacles) > 7):
+            if ((snowball[0] + 1, snowball[1]) or right_edge) in obstacles and ((snowball[0], snowball[1] + 1) in obstacles or top_edge) and goal[0] != snowball[0]:
+                return PENALTY
+            # top left
+            if ((snowball[0] - 1, snowball[1]) or left_edge) in obstacles and ((snowball[0], snowball[1] + 1) in obstacles or top_edge) and goal[0] != snowball[0]:
+                return PENALTY
+            # bottom right
+            if ((snowball[0], snowball[1] + 1) or bottom_edge) in obstacles and ((snowball[0] + 1, snowball[1]) in obstacles or right_edge) and goal[1] != snowball[1]:
+                return PENALTY
+            # bottom left
+            if ((snowball[0], snowball[1] + 1) or bottom_edge) in obstacles and ((snowball[0] - 1, snowball[1]) in obstacles or left_edge) and goal[1] != snowball[1]:
+                return PENALTY
         
 
         '''
