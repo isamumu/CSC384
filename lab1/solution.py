@@ -134,7 +134,7 @@ def heur_alternate(state):
             return PENALTY
         '''
 
-        '''
+        
         if ((snowball[0] + 1, snowball[1]) in hash_obs or right_edge) and ((snowball[0], snowball[1] + 1) in hash_obs or top_edge) and goal[0] != snowball[0]:
             return PENALTY
         # top left
@@ -146,7 +146,7 @@ def heur_alternate(state):
         # bottom left
         if ((snowball[0], snowball[1] + 1) in hash_obs or bottom_edge) and ((snowball[0] - 1, snowball[1]) in hash_obs or left_edge) and goal[1] != snowball[1]:
             return PENALTY
-        '''
+        
         
         # edge checks
         if right_edge and goal[0] != snowball[0]:
