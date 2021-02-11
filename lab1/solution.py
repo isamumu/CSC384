@@ -120,7 +120,7 @@ def heur_alternate(state):
         
         # check against obstacles
         # top right
-        '''
+        
         if ((snowball[0] + 1, snowball[1]) or right_edge) in obstacles and ((snowball[0], snowball[1] + 1) in obstacles or top_edge) and goal[0] != snowball[0]:
             return PENALTY
         # top left
@@ -132,9 +132,9 @@ def heur_alternate(state):
         # bottom left
         if ((snowball[0], snowball[1] + 1) or bottom_edge) in obstacles and ((snowball[0] - 1, snowball[1]) in obstacles or left_edge) and goal[1] != snowball[1]:
             return PENALTY
-        '''
-
         
+
+        '''
         if ((snowball[0] + 1, snowball[1]) in hash_obs or right_edge) and ((snowball[0], snowball[1] + 1) in hash_obs or top_edge) and goal[0] != snowball[0]:
             return PENALTY
         # top left
@@ -146,7 +146,7 @@ def heur_alternate(state):
         # bottom left
         if ((snowball[0], snowball[1] + 1) in hash_obs or bottom_edge) and ((snowball[0] - 1, snowball[1]) in hash_obs or left_edge) and goal[1] != snowball[1]:
             return PENALTY
-        
+        '''
         
         # edge checks
         if right_edge and goal[0] != snowball[0]:
@@ -163,7 +163,7 @@ def heur_alternate(state):
     
     # mini = min(cost)
     # mini2 = min(cost2)
-    return heur_manhattan_distance(state) + trivial_heuristic(state)# + mini2
+    return trivial_heuristic(state)# + mini2
 
 def heur_zero(state):
     '''Zero Heuristic can be used to make A* search perform uniform cost search'''
