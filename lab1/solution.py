@@ -72,7 +72,7 @@ def heur_alternate(state):
     robot = state.robot
     goal = state.destination
     obstacles = state.obstacles
-    hash_obs = {}
+
     cost = [] # find the cost representing the closes snowball to the robot (no need to accumilate all costs)
 
     # cost2 = [] 
@@ -88,7 +88,7 @@ def heur_alternate(state):
     for snowball in state.snowballs:
         cost.append(abs(robot[0] - snowball[0]) + abs(robot[1] - snowball[1]))
         # cost2.append(abs(snowball[0] - goal[0]) + abs(snowball[1] - goal[1]))
-        # snowball[0] == goal[0] somehow works! 
+       
         if snowball[0] == goal[0]:
             continue
         
@@ -148,6 +148,7 @@ def heur_alternate(state):
         elif top_edge and goal[1] != snowball[1]:
             return PENALTY
         
+        # tried below, but did not improve runtime
         '''
         if (robot[0] - 1, robot[1]) == snowball and (robot[0] - 2, robot[1]) in state.snowballs and ((robot[0] - 2, robot[1]) in obstacles or (robot[0] - 2) == -1):
             return PENALTY
@@ -188,7 +189,7 @@ def fval_function(sN, weight):
     return sN.gval + sN.hval*weight
 
 # (approx. 20 lines)
-def anytime_weighted_astar(initial_state, heur_fn, weight=1.0, timebound = 5):
+def anytime_weighted_astar(initial_state, heur_fn, weight=25, timebound = 5):
 #IMPLEMENT
     '''Provides an implementation of anytime weighted a-star, as described in the HW1 handout'''
     '''INPUT: a sokoban state that represents the start state and a timebound (number of seconds)'''
@@ -203,6 +204,7 @@ def anytime_weighted_astar(initial_state, heur_fn, weight=1.0, timebound = 5):
     elapsed = 0
     costbound = (float('inf'), float('inf'), float('inf'))
     goal_state = False
+    w = weight
 
     while elapsed < timebound - 0.5:
         # time remaining for the search will be timebound - elapsed   
@@ -217,6 +219,11 @@ def anytime_weighted_astar(initial_state, heur_fn, weight=1.0, timebound = 5):
             goal_state = found_state 
         else:
             return goal_state
+        
+        # decrement the weight
+        w -= 0.05
+        fval_fct = (lambda sN : fval_function(sN, w))
+        engine.init_search(initial_state, snowman_goal_state, heur_fn, fval_fct)
 
     return goal_state
 
