@@ -8,6 +8,14 @@ Construct and return Tenner Grid CSP models.
 from cspbase import *
 import itertools
 
+def all_pairs(V1,V2):
+    out = [] # will be array of tuples
+    for d1 in V1.domain():
+        for d2 in V2.domain():
+            if (d1 != d2):
+                out.append((d1,d2))
+    return out
+
 def tenner_csp_model_1(initial_tenner_board):
     '''Return a CSP object representing a Tenner Grid CSP problem along 
        with an array of variables for the problem. That is return
