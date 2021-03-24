@@ -188,5 +188,5 @@ def ord_mrv(csp):
             min_value = var
             min_domain = var.cur_domain_size()
     
-    return min_val
+    return min_value
 	
