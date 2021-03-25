@@ -8,14 +8,6 @@ Construct and return Tenner Grid CSP models.
 from cspbase import *
 import itertools
 
-def all_pairs(V1,V2):
-    out = [] # will be array of tuples
-    for d1 in V1.domain():
-        for d2 in V2.domain():
-            if (d1 != d2):
-                out.append((d1,d2))
-    return out
-
 def tenner_csp_model_1(initial_tenner_board):
     '''Return a CSP object representing a Tenner Grid CSP problem along 
        with an array of variables for the problem. That is return
@@ -73,68 +65,87 @@ def tenner_csp_model_1(initial_tenner_board):
        column.
     '''
     
-#IMPLEMENT
-    #INITIALIZE VARS
-    G,LR = initial_tenner_board
-    #print("LR ",LR)
-    V_array = [[0 for x in range(10)] for j in range(len(G))] # N of rows
-    #print(V_array)
-    #V_array[3][0] = 2000
-    for i in range(len(G)):
-        for j in range(10):
-            if G[i][j] == -1: # domain should be 0-9
-                V = Variable(str(i) + ' '+str(j),[x for x in range(10)])
-                V_array[i][j] = V
-            else:
-               # print(i,j)
-                V = Variable(str(i) + ' '+str(j),[G[i][j]]) #Domain is what's there
-                V.assign(G[i][j])
-                V_array[i][j] = V
-    CS = CSP("Tenner Model 1",[V_array[z][y] for z in range(len(G)) for y in range(10)])
-    # DO constraints
-    #Start with differences
-    N = len(G)
-    for i in range(N):
-        for j in range(10):
-            #ADJ VER
-            if i!= (N-1):
-                C = Constraint("ADJ_VERT",[V_array[i][j],V_array[i+1][j]])
-                C.add_satisfying_tuples(all_pairs(V_array[i][j],V_array[i+1][j]))
-                CS.add_constraint(C)
-            # ADJ DIAG
-            if ((i!= (N-1)) and (j!= 9)):
-                C = Constraint("DIAG",[V_array[i][j],V_array[i+1][j+1]])
-                C.add_satisfying_tuples(all_pairs(V_array[i][j],V_array[i+1][j+1]))
-                CS.add_constraint(C)
-            #DIAG OTHER SIDE
-            if ( (i!= (N-1)) and (j!= 0)):
-                C = Constraint("DIAG",[V_array[i][j],V_array[i+1][j-1]])
-                C.add_satisfying_tuples(all_pairs(V_array[i][j],V_array[i+1][j-1]))
-                CS.add_constraint(C)
-            #THIS DEALS WITH ROW CONSTRAINTS
-            for k in range(j+1,10):
-                C = Constraint("ROWS",[V_array[i][j],V_array[i][k]])
-                # ADD ALL POSSIBLE VALUES
-                C.add_satisfying_tuples(all_pairs(V_array[i][j],V_array[i][k]))
-                CS.add_constraint(C)
-    #SUM CONSTRAINT
-    #GEN FUNCTION
+    #IMPLEMENT
 
-    for I in range(10): # I Is column number
-        #GEN_ALL(LR[I],[],0)
-        L= [V_array[x][I].cur_domain() for x in range(N)]
-        #print(L)
-        C = Constraint("Sum of Col " + str(I),[V_array[i][I] for i in range(N)])
-        for P in itertools.product(*L):
-            if sum(P) == LR[I]:
-                #print(P,LR[I])
-                C.add_satisfying_tuples([P])
-        CS.add_constraint(C)
-        
-    #print("mamatsh")
-    # Now we have all the possibilityes
-    return CS,V_array
-    #return None, None #CHANGE THIS
+    # what constraints do I need:
+    # --> row constraints, column constraints, block constraints, sub-square constraints (All - Diff(...))
+    rows = len(initial_tenner_board[0]) # variable row value
+    tenner = [[0 for x in range(10)] for y in range(rows)] # board matrix
+
+    # set up the board
+    for i in range(rows):
+        for j in range(10):
+            pos = initial_tenner_board[0][i][j]
+
+            # check for empty cells; if empty 
+            if pos == -1:
+                tenner[i][j] = Variable("V{}{}".format(i,j), list(range(10)))
+            else:
+                tenner[i][j] = Variable("V{}{}".format(i,j), [pos])
+
+    # create the tenner CSP object here so we can keep adding constraints in successive functions
+    # --> would like to avoid having too many moving parts, so the approach will be to sequentially check the adjacent boxes
+    tenner_csp = CSP("tenner_model_1", [tenner[x][y] for x in range(rows) for y in range(10)])
+
+    # add the constraints 
+    for x in range(rows):
+        for y in range(10):
+            # vertical constraints 
+            for z in range(y+1, 10): # check the constraints for every consecutive value down 
+                con = Constraint("row", [tenner[x][y], tenner[x][z]]) # create row constraint object
+                array = []
+                for i in tenner[x][y].domain():
+                    for j in tenner[x][z].domain():
+                        if i != j:
+                            array.append((i,j))
+                con.add_satisfying_tuples(array)
+                tenner_csp.add_constraint(con)
+
+            # diagonal constraints ---> with slope of 1
+            if x != (rows-1) and y != 9: # check for the out of bounds condition and off by 1 consition for the column index
+                # ensure that for the negative slope, that we are considering elements that are less than 9 since we have only 10 indices which include index 0
+                con = Constraint("upDiagonal", [tenner[x][y], tenner[x+1][y+1]]) # create row constraint object
+                array = []
+                for i in tenner[x][y].domain():
+                    for j in tenner[x+1][y+1].domain():
+                        if i != j:
+                            array.append((i,j))
+                con.add_satisfying_tuples(array)
+                tenner_csp.add_constraint(con)
+
+            # diagonal constraints ---> with slope of -1
+            if x != (rows-1) and y != 0: # check for the out of bounds condition and off by 1 consition for the column index
+                # ensure that for the negative slope, that we are considering elements that are at least greater than 1
+                con = Constraint("downDiagonal", [tenner[x][y], tenner[x+1][y-1]]) # create row constraint object
+                array = []
+                for i in tenner[x][y].domain():
+                    for j in tenner[x+1][y-1].domain():
+                        if i != j:
+                            array.append((i,j))
+                con.add_satisfying_tuples(array)
+                tenner_csp.add_constraint(con)
+
+            # horizontal constraints ---> check the right adjacent cells
+            if x != (rows-1): # check for the out of bounds condition
+                con = Constraint("column", [tenner[x][y], tenner[x+1][y]]) # create row constraint object
+                array = []
+                for i in tenner[x][y].domain():
+                    for j in tenner[x+1][y].domain():
+                        if i != j:
+                            array.append((i,j))
+                con.add_satisfying_tuples(array)
+                tenner_csp.add_constraint(con)
+
+    # check for sum constraints 
+    for col in range(10): # loop through the column indices to check for the sum constraints 
+        col_domain = [tenner[x][col].cur_domain() for x in range(rows)] # obtain a list of domains for each column
+        con = Constraint("sum of index " + str(col), [tenner[i][col] for i in range(rows)]) # create constraint object
+
+        for prod in itertools.product(*col_domain): # use itertools to find every combination which satisfies the sum constraint
+            if sum(prod) == initial_tenner_board[1][col]:
+                con.add_satisfying_tuples([prod])
+        tenner_csp.add_constraint(con)
+    return tenner_csp, tenner #CHANGE THIS
 ##############################
 
 def tenner_csp_model_2(initial_tenner_board):
@@ -177,5 +188,97 @@ def tenner_csp_model_2(initial_tenner_board):
        all-different constraints between the relevant variables.
     '''
 
-#IMPLEMENT
-    return None, None #CHANGE THIS
+    #IMPLEMENT
+    # # NOTE DIFFERENCE: these constraints are derived from a combination of n-ary all-different constraints
+    # # ie. row constraints and sum of column constraints. Also consider contiguous (diagonal) constraints too
+
+    rows = len(initial_tenner_board[0]) # variable row value
+    tenner = [[0 for x in range(10)] for y in range(rows)] # board matrix
+
+    # set up the board
+    for i in range(rows):
+        for j in range(10):
+            pos = initial_tenner_board[0][i][j]
+
+            # check for empty cells; if empty 
+            if pos == -1:
+                tenner[i][j] = Variable("V{}{}".format(i,j), list(range(10)))
+            else:
+                tenner[i][j] = Variable("V{}{}".format(i,j), [pos])
+    
+    tenner_csp = CSP("tenner_model_2", [tenner[x][y] for x in range(rows) for y in range(10)])
+
+    
+    for x in range(rows):
+        # idea is to find elements in a given row and add the ones that currently do not exist 
+        # this will hopefully find the n-ary values for each row, allowing for an all diff constraint
+        sat_tuples = []
+        domain = list([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+        items = []
+
+        # add the n-ary all diff constraints here
+        for y in range(10):
+            if tenner[x][y] == -1:
+                items.append(tenner[x][y])
+            else:
+                if tenner[x][y] in domain:
+                    tenner.remove(tenner[x][y])
+        
+        # find the satisfying tuples here:
+        for i in itertools.permutations(domain, len(items)):
+            sat_tuples.append(i)
+
+        # all variables should have 10 variables because 10 variables per row
+        con = Constraint("n-ary row: " + str(x), items)
+        con.add_satisfying_tuples(sat_tuples)
+        tenner_csp.add_constraint(con)
+
+        for y in range(10):
+
+            # diagonal constraints ---> with slope of 1
+            if x != (rows-1) and y != 9: # check for the out of bounds condition and off by 1 consition for the column index
+                # ensure that for the negative slope, that we are considering elements that are less than 9 since we have only 10 indices which include index 0
+                con = Constraint("upDiagonal", [tenner[x][y], tenner[x+1][y+1]]) # create row constraint object
+                array = []
+                for i in tenner[x][y].domain():
+                    for j in tenner[x+1][y+1].domain():
+                        if i != j:
+                            array.append((i,j))
+                con.add_satisfying_tuples(array)
+                tenner_csp.add_constraint(con)
+
+            # diagonal constraints ---> with slope of -1
+            if x != (rows-1) and y != 0: # check for the out of bounds condition and off by 1 consition for the column index
+                # ensure that for the negative slope, that we are considering elements that are at least greater than 1
+                con = Constraint("downDiagonal", [tenner[x][y], tenner[x+1][y-1]]) # create row constraint object
+                array = []
+                for i in tenner[x][y].domain():
+                    for j in tenner[x+1][y-1].domain():
+                        if i != j:
+                            array.append((i,j))
+                con.add_satisfying_tuples(array)
+                tenner_csp.add_constraint(con)
+
+            # horizontal constraints ---> check the right adjacent cells
+            if x != (rows-1): # check for the out of bounds condition
+                con = Constraint("column", [tenner[x][y], tenner[x+1][y]]) # create row constraint object
+                array = []
+                for i in tenner[x][y].domain():
+                    for j in tenner[x+1][y].domain():
+                        if i != j:
+                            array.append((i,j))
+                con.add_satisfying_tuples(array)
+                tenner_csp.add_constraint(con)
+
+    # check for sum of column constraints 
+    for col in range(10): # loop through the column indices to check for the sum constraints 
+        col_domain = [tenner[x][col].cur_domain() for x in range(rows)] # obtain a list of domains for each column
+        con = Constraint("sum of index " + str(col), [tenner[i][col] for i in range(rows)]) # create constraint object
+
+        for prod in itertools.product(*col_domain): # use itertools to find every combination which satisfies the sum constraint
+            if sum(prod) == initial_tenner_board[1][col]:
+                con.add_satisfying_tuples([prod])
+        tenner_csp.add_constraint(con)
+
+    return tenner_csp, tenner #CHANGE THIS
+    # return None, None

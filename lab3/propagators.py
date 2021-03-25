@@ -88,25 +88,6 @@ def prop_BT(csp, newVar=None):
                 return False, []
     return True, []
 
-# custom code based for FC check
-def FCCheck(C,X):
-
-    values = []
-    variables = C.get_scope()
-
-    for var in variables:
-        values.append(X.get_assigned_value())
-    
-    var_index = values.index(None)
-    
-
-    
-    
-    if X.cur_domain_size() != 0:
-        return (False, prunes)
-    elif variable.cur_domain_size() == 0:
-        return (True, prunes)
-
 def prop_FC(csp, newVar=None):
     '''Do forward checking. That is check constraints with 
        only one uninstantiated variable. Remember to keep 
@@ -121,7 +102,6 @@ def prop_FC(csp, newVar=None):
         cons = csp.get_all_cons()
     else: 
         cons = csp.get_cons_with_var(newVar)
-
 
     for con in cons:
         if con.get_n_unasgn() == 1:
@@ -140,8 +120,6 @@ def prop_FC(csp, newVar=None):
     
     return True, prunes
 
-    
-
 def prop_GAC(csp, newVar=None):
     '''Do GAC propagation. If newVar is None we do initial GAC enforce 
        processing all constraints. Otherwise we do GAC enforce with
@@ -156,7 +134,7 @@ def prop_GAC(csp, newVar=None):
         GAC_q = csp.get_all_cons()
     
     while GAC_q != []:
-        constraint = GAC_q.pop(0)
+        constraint = GAC_q.pop(0) # obtain the first index
 
         for var in constraint.get_scope():
             for dom in var.cur_domain():
