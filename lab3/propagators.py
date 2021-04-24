@@ -136,7 +136,7 @@ def prop_GAC(csp, newVar=None):
     while GAC_q != []:
         constraint = GAC_q.pop(0) # obtain the first index
 
-        for var in constraint.get_scope():
+        for var in constraint.get_scope(): 
             for dom in var.cur_domain():
                 support = constraint.has_support(var, dom)
                 if not support:
