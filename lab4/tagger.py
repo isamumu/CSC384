@@ -6,6 +6,19 @@ import sys
 import numpy as np
 import time
 
+def transitions(t2, t1, train_set, tags):
+    
+    count_t1 = 0
+    for t in tags:
+        if t == t1:
+            count_t1 += 1
+    count_t2_t1 = 0
+  
+    for index in range(len(tags)-1):
+        if tags[index]==t1 and tags[index+1] == t2:
+            count_t2_t1 += 1
+    return (count_t2_t1, count_t1)
+
 def tag(training_list, test_file, output_file):
     # Tag the words from the untagged input file and write them into the output file.
     # Doesn't do much else beyond that yet.
@@ -19,25 +32,21 @@ def tag(training_list, test_file, output_file):
     test = []
     start = time.time()
     # load the tagged tuples
-    for training_file in training_list:
-        with open(training_file) as f: 
-            contents = f.read()
-            contents = contents.split("\n")
-            
-            for i in contents:
-                if i != '':
-                    pairs.append(i.split(" : "))
+    with open('training10.txt') as f: 
+        contents = f.read()
+        contents = contents.split("\n")
+        
+        for i in contents:
+            if i != '':
+                pairs.append(i.split(" : "))
     
-    with open(test_file) as f: 
+    with open('test10.txt') as f: 
         contents = f.read()
         contents = contents.split("\n")
         
         for i in contents:
             if i != '':
                 test.append(i.split(" : "))
-
-    end = time.time()
-    # print("time taken 1:", (end - start))
 
     # STEP 2: create a probability (emission, and transition) tables
     print("===============================================================")
@@ -81,28 +90,17 @@ def tag(training_list, test_file, output_file):
             emissions[tuplee] = emissions[tuplee] / totals[tag]
 
     # ---- create transition probabilities ---- 
+    tagz = []
+    for pair in pairs:
+        tagz.append(pair[1])
     tags_matrix = {}
     for _, t1 in enumerate(list(tags)):
         for _, t2 in enumerate(list(tags)):
             # print("t1={}, t2={}".format(x1, x2))
             # print("trans={} total={}".format(transitions(t2, t1, pairs)[0],transitions(t2, t1, pairs)[1]))
-            count_t1 = 0
-            for t in tags:
-                if t == t1:
-                    count_t1 += 1
-            counter = 0
-
-            for index in range(len(tags)-1):
-                if tags[index]==t1 and tags[index+1] == t2:
-                    counter += 1
-            
-            trans = (counter, count_t1)
-
-            tags_matrix[(t1, t2)] = trans[0]/trans[1] # gets the probability of getting x2 after x1
-
+            tags_matrix[(t1, t2)] = transitions(t2, t1, pairs, tagz)[0]/transitions(t2, t1, pairs, tagz)[1] # gets the probability of getting x2 after x1
+   
     # print(tags_matrix)
-    end = time.time()
-    # print("time taken 2:", (end - start))
     # STEP 3: develop a trellis forward pass algorithm for the nodes and path
     word_seq = []
     state = []
@@ -119,12 +117,7 @@ def tag(training_list, test_file, output_file):
                 tran_p = 1 # no transition to the first word
             else: 
                 tran_p = tags_matrix[(state[key - 1], tag)] # otherwise, from prev max state to current state (tag)
-            
-            if (word,tag) in emissions.keys():
-                emit_p = emissions[(word, tag)]
-            else: 
-                emit_p = 1
-
+            emit_p = emissions[(word, tag)]
             state_p = emit_p * tran_p
             p.append(state_p)
 
@@ -134,21 +127,23 @@ def tag(training_list, test_file, output_file):
     
     end = time.time()
     # STEP 4: develop a backtracking algorithm which goes back, and restores all the labels
-    fileOut = open(output_file, 'w')
+    fileOut = open('output.txt', 'w')
     for key, word in enumerate(word_seq):
         s = word + " : " + state[key] + "\n"
         fileOut.write(s)
         tagged.append((word, state[key]))
 
-    print("time taken (s):", (end - start))
+    # time_elapsed = (end - start)
+    
     # matches = 0
     # total = len(pairs)
 
     # for key, pair in enumerate(pairs):
-    #     print("{} vs {}".format(pair[1], state[key]))
-    #     if pair[1] == state[key]:
-    #         matches += 1
+        # print("{} vs {}".format(pair[1], state[key]))
+        # if pair[1] == state[key]:
+            # matches += 1
 
+    # print("time taken (s):", time_elapsed)
     # acc = matches / total
     # print("accuracy: ", acc * 100)
 if __name__ == '__main__':
